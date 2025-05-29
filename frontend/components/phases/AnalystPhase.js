@@ -6,10 +6,101 @@ import { DocumentIcon, CheckIcon, ChatIcon } from '../Icons';
 export default function AnalystPhase({ session, phaseData, onComplete, onDataUpdate }) {
   const [mode, setMode] = useState('chat'); // chat, preview, complete
   const [generatedContent, setGeneratedContent] = useState(phaseData.generatedContent || '');
+
+  // 🏭 INDUSTRY-SPECIFIC CONTEXT - Enhanced context for better business analysis
+  const getIndustryContext = (projectName) => {
+    const name = projectName.toLowerCase();
+
+    // Industry detection based on project name keywords
+    if (name.includes('ecommerce') || name.includes('shop') || name.includes('store') || name.includes('marketplace')) {
+      return {
+        industry: 'E-commerce',
+        keyConsiderations: [
+          'Payment processing and security compliance',
+          'Inventory management and order fulfillment',
+          'Customer acquisition and retention strategies',
+          'Mobile-first shopping experience',
+          'Search and recommendation algorithms'
+        ],
+        competitorAnalysis: 'Amazon, Shopify, WooCommerce, BigCommerce',
+        regulatoryFactors: 'PCI DSS compliance, GDPR, consumer protection laws'
+      };
+    } else if (name.includes('fintech') || name.includes('banking') || name.includes('finance') || name.includes('payment')) {
+      return {
+        industry: 'FinTech',
+        keyConsiderations: [
+          'Regulatory compliance and licensing',
+          'Security and fraud prevention',
+          'Real-time transaction processing',
+          'KYC/AML requirements',
+          'API integrations with financial institutions'
+        ],
+        competitorAnalysis: 'Stripe, Square, PayPal, Plaid, Robinhood',
+        regulatoryFactors: 'PCI DSS, SOX, GDPR, PSD2, banking regulations'
+      };
+    } else if (name.includes('health') || name.includes('medical') || name.includes('telemedicine') || name.includes('healthcare')) {
+      return {
+        industry: 'HealthTech',
+        keyConsiderations: [
+          'HIPAA compliance and patient privacy',
+          'Medical data security and encryption',
+          'Integration with EHR systems',
+          'Telemedicine capabilities',
+          'Clinical workflow optimization'
+        ],
+        competitorAnalysis: 'Epic, Cerner, Teladoc, Amwell, Doxy.me',
+        regulatoryFactors: 'HIPAA, FDA regulations, state medical licensing'
+      };
+    } else if (name.includes('education') || name.includes('learning') || name.includes('course') || name.includes('school')) {
+      return {
+        industry: 'EdTech',
+        keyConsiderations: [
+          'Student data privacy (FERPA compliance)',
+          'Accessibility and inclusive design',
+          'Learning analytics and progress tracking',
+          'Content management and delivery',
+          'Integration with LMS platforms'
+        ],
+        competitorAnalysis: 'Canvas, Blackboard, Coursera, Udemy, Khan Academy',
+        regulatoryFactors: 'FERPA, COPPA, accessibility standards (WCAG)'
+      };
+    } else if (name.includes('saas') || name.includes('software') || name.includes('platform') || name.includes('tool')) {
+      return {
+        industry: 'SaaS/Software',
+        keyConsiderations: [
+          'Scalable multi-tenant architecture',
+          'Subscription billing and pricing models',
+          'API-first design and integrations',
+          'User onboarding and adoption',
+          'Data analytics and reporting'
+        ],
+        competitorAnalysis: 'Salesforce, HubSpot, Slack, Notion, Airtable',
+        regulatoryFactors: 'GDPR, SOC 2 compliance, data residency requirements'
+      };
+    }
+
+    // Default general business context
+    return {
+      industry: 'General Business',
+      keyConsiderations: [
+        'User experience and interface design',
+        'Scalability and performance requirements',
+        'Data security and privacy protection',
+        'Integration capabilities',
+        'Market differentiation strategies'
+      ],
+      competitorAnalysis: 'Research direct and indirect competitors in your market',
+      regulatoryFactors: 'GDPR, accessibility standards, industry-specific regulations'
+    };
+  };
+
+  const industryContext = getIndustryContext(session.projectName);
+
   const chatContext = {
     projectName: session.projectName,
     phase: 'analyst',
-    sessionId: session.id
+    sessionId: session.id,
+    industryContext
   };
 
   const handleContentGenerated = (content, templateName) => {
@@ -104,6 +195,32 @@ export default function AnalystPhase({ session, phaseData, onComplete, onDataUpd
               <li>• Create comprehensive project briefs</li>
               <li>• Ask for template generation when ready</li>
             </ul>
+          </div>
+
+          {/* 🏭 Industry-Specific Context Display */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
+            <h4 className="font-medium text-purple-900 mb-3 flex items-center">
+              🏭 Detected Industry: {industryContext.industry}
+            </h4>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <h5 className="font-medium text-purple-800 mb-2">Key Considerations:</h5>
+                <ul className="text-sm text-purple-700 space-y-1">
+                  {industryContext.keyConsiderations.map((consideration, index) => (
+                    <li key={index}>• {consideration}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h5 className="font-medium text-purple-800 mb-2">Regulatory Factors:</h5>
+                <p className="text-sm text-purple-700 mb-3">{industryContext.regulatoryFactors}</p>
+
+                <h5 className="font-medium text-purple-800 mb-2">Competitor Analysis:</h5>
+                <p className="text-sm text-purple-700">{industryContext.competitorAnalysis}</p>
+              </div>
+            </div>
           </div>
 
           <AIChat

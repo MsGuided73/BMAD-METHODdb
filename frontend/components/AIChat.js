@@ -79,6 +79,7 @@ export default function AIChat({ agentId, phase, context = {}, onContentGenerate
           agentId,
           phase,
           message: inputMessage,
+          sessionId: context.sessionId,
           context: {
             ...context,
             chatHistory: messages
@@ -124,6 +125,7 @@ export default function AIChat({ agentId, phase, context = {}, onContentGenerate
         body: JSON.stringify({
           templateName,
           agentId,
+          sessionId: context.sessionId,
           context: {
             ...context,
             chatHistory: messages

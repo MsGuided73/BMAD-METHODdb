@@ -1,128 +1,70 @@
-import { useState, useEffect } from 'react';
-import { useSession } from '../../contexts/SessionContext';
-import TemplateForm from '../TemplateForm';
+import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import AIChat from '../AIChat';
 import DocumentPreview from '../DocumentPreview';
 import ChecklistValidator from '../ChecklistValidator';
-import { PlusIcon, DocumentIcon, ClipboardListIcon, CheckIcon } from '../Icons';
+import { ClipboardListIcon, CheckIcon, ChatIcon } from '../Icons';
 
 export default function SMPhase({ session, phaseData, onComplete, onDataUpdate }) {
-  const { templates } = useSession();
-  const [step, setStep] = useState('stories'); // stories, validation, complete
-  const [storySchema, setStorySchema] = useState(null);
-  const [stories, setStories] = useState(phaseData.stories || []);
-  const [currentStory, setCurrentStory] = useState({});
+  const [step, setStep] = useState('chat'); // chat, validation, complete
+  const [generatedContent, setGeneratedContent] = useState(phaseData.generatedContent || '');
   const [checklistData, setChecklistData] = useState(phaseData.checklistData || null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadStoryTemplate();
-  }, []);
-
-  const loadStoryTemplate = async () => {
-    try {
-      const schema = await templates.getSchema('story-epicnum.storynum-short-title-copied-from-epic-file.md');
-      setStorySchema(schema);
-    } catch (error) {
-      console.error('Failed to load story template schema:', error);
-    }
+  // 📝 COMPREHENSIVE CONTEXT - All previous phase outputs for complete user story generation
+  const chatContext = {
+    projectName: session.projectName,
+    projectBrief: session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief')?.content || '',
+    prd: session.phases?.pm?.outputs?.find(o => o.type === 'prd')?.content || '',
+    architecture: session.phases?.architect?.outputs?.find(o => o.type === 'architecture')?.content || '',
+    frontendArchitecture: session.phases?.designArchitect?.outputs?.find(o => o.type === 'frontend-architecture')?.content || '',
+    uiuxSpec: session.phases?.designArchitect?.outputs?.find(o => o.type === 'uiux-spec')?.content || '',
+    poValidation: session.phases?.po?.outputs?.find(o => o.type === 'po-validation')?.content || '',
+    phase: 'sm',
+    sessionId: session.id
   };
 
-  const handleCurrentStoryChange = (data) => {
-    setCurrentStory(data);
-  };
-
-  const handleGenerateStory = async () => {
-    if (!storySchema || !currentStory.title) return;
-
-    setLoading(true);
-    try {
-      // Get context from previous phases
-      const prd = session.phases.pm?.outputs?.find(o => o.type === 'prd')?.content || '';
-      const architecture = session.phases.architect?.outputs?.find(o => o.type === 'architecture')?.content || '';
-      const uiuxSpec = session.phases.designArchitect?.outputs?.find(o => o.type === 'uiux-spec')?.content || '';
-      
-      const storyNumber = stories.length + 1;
-      const result = await templates.fill('story-epicnum.storynum-short-title-copied-from-epic-file.md', {
-        ...currentStory,
-        'Project Name': session.projectName,
-        'Story Number': storyNumber,
-        'Epic Number': Math.ceil(storyNumber / 3), // Group stories into epics of 3
-        'PRD Context': prd.slice(0, 1000),
-        'Architecture Context': architecture.slice(0, 500),
-        'UI/UX Context': uiuxSpec.slice(0, 500)
-      });
-      
-      const newStory = {
-        id: `story-${storyNumber}`,
-        title: currentStory.title || `Story ${storyNumber}`,
-        content: result.content,
-        filename: `story-${storyNumber}-${currentStory.title?.toLowerCase().replace(/\s+/g, '-') || 'untitled'}.md`,
-        createdAt: new Date().toISOString()
-      };
-
-      const updatedStories = [...stories, newStory];
-      setStories(updatedStories);
-      setCurrentStory({});
-      
-      onDataUpdate({ 
-        ...phaseData, 
-        stories: updatedStories,
-        step 
-      });
-    } catch (error) {
-      console.error('Failed to generate story:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRemoveStory = (storyId) => {
-    const updatedStories = stories.filter(story => story.id !== storyId);
-    setStories(updatedStories);
-    onDataUpdate({ 
-      ...phaseData, 
-      stories: updatedStories,
-      step 
-    });
-  };
-
-  const handleProceedToValidation = () => {
+  const handleContentGenerated = (content, templateName) => {
+    setGeneratedContent(content);
     setStep('validation');
-    onDataUpdate({ ...phaseData, stories, step: 'validation' });
+    onDataUpdate({
+      ...phaseData,
+      generatedContent: content,
+      templateName,
+      step: 'validation'
+    });
   };
 
   const handleChecklistComplete = (checklistResults) => {
     setChecklistData(checklistResults);
     setStep('complete');
-    onDataUpdate({ 
-      ...phaseData, 
-      stories,
+    onDataUpdate({
+      ...phaseData,
+      generatedContent,
       checklistData: checklistResults,
-      step: 'complete' 
+      step: 'complete'
     });
   };
 
   const handleCompletePhase = () => {
-    const outputs = stories.map(story => ({
-      type: 'story',
-      content: story.content,
-      filename: story.filename,
-      title: story.title
-    }));
+    const outputs = [{
+      type: 'user-stories',
+      content: generatedContent,
+      filename: `${session.projectName.toLowerCase().replace(/\s+/g, '-')}-user-stories.md`
+    }];
 
-    onComplete({ 
-      stories,
+    onComplete({
+      generatedContent,
       checklistData,
-      step: 'complete' 
+      step: 'complete'
     }, outputs);
   };
 
   const steps = [
     {
-      id: 'stories',
-      name: 'Story Creation',
-      description: 'Create detailed user stories with acceptance criteria',
-      icon: DocumentIcon,
+      id: 'chat',
+      name: 'AI Consultation',
+      description: 'Chat with your Scrum Master AI',
+      icon: ChatIcon,
       color: 'blue'
     },
     {
@@ -169,7 +111,7 @@ export default function SMPhase({ session, phaseData, onComplete, onDataUpdate }
             </div>
           ))}
         </div>
-        
+
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-900">
             {steps.find(s => s.id === step)?.name}
@@ -181,111 +123,176 @@ export default function SMPhase({ session, phaseData, onComplete, onDataUpdate }
       </div>
 
       {/* Step Content */}
-      {step === 'stories' && (
+      {step === 'chat' && (
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 mb-2">Scrum Master Story Guidelines</h4>
+            <h4 className="font-medium text-blue-900 mb-2">AI Scrum Master</h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Create user stories following "As a... I want... So that..." format</li>
-              <li>• Define clear acceptance criteria for each story</li>
-              <li>• Ensure stories are testable and deliverable</li>
-              <li>• Break down complex features into manageable stories</li>
+              <li>• Create comprehensive user stories with acceptance criteria</li>
+              <li>• Break down features into manageable, testable stories</li>
+              <li>• Follow "As a... I want... So that..." format</li>
+              <li>• Ask for user stories generation when ready</li>
             </ul>
           </div>
 
-          {/* Story Creation Form */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">Create New User Story</h4>
-            
-            {storySchema && (
-              <TemplateForm
-                schema={storySchema}
-                data={currentStory}
-                onChange={handleCurrentStoryChange}
-                title="Story Details"
-              />
-            )}
+          {/* 📚 Complete Project Context for Story Creation */}
+          <div className="space-y-4">
+            <h4 className="font-medium text-blue-900 mb-3">📚 Complete Project Context for User Story Creation:</h4>
 
-            {Object.keys(currentStory).length > 0 && currentStory.title && (
-              <div className="mt-6 flex justify-center">
-                <button
-                  onClick={handleGenerateStory}
-                  disabled={loading}
-                  className="btn btn-primary btn-lg"
-                >
-                  {loading ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Generating Story...
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <PlusIcon className="h-5 w-5 mr-2" />
-                      Generate User Story
-                    </div>
-                  )}
-                </button>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief') && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3">
+                  <h5 className="font-medium text-green-900 mb-2 flex items-center text-sm">
+                    📋 Project Brief
+                    <span className="ml-1 px-1 py-0.5 bg-green-100 text-green-800 text-xs rounded">
+                      Analyst
+                    </span>
+                  </h5>
+                  <div className="text-xs text-green-700 max-h-20 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                    <ReactMarkdown>
+                      {session.phases.analyst.outputs.find(o => o.type === 'project-brief').content.slice(0, 200)}...
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {session.phases?.pm?.outputs?.find(o => o.type === 'prd') && (
+                <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3">
+                  <h5 className="font-medium text-orange-900 mb-2 flex items-center text-sm">
+                    📋 PRD
+                    <span className="ml-1 px-1 py-0.5 bg-orange-100 text-orange-800 text-xs rounded">
+                      PM
+                    </span>
+                  </h5>
+                  <div className="text-xs text-orange-700 max-h-20 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                    <ReactMarkdown>
+                      {session.phases.pm.outputs.find(o => o.type === 'prd').content.slice(0, 200)}...
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {session.phases?.architect?.outputs?.find(o => o.type === 'architecture') && (
+                <div className="bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 rounded-lg p-3">
+                  <h5 className="font-medium text-purple-900 mb-2 flex items-center text-sm">
+                    🏗️ Architecture
+                    <span className="ml-1 px-1 py-0.5 bg-purple-100 text-purple-800 text-xs rounded">
+                      Architect
+                    </span>
+                  </h5>
+                  <div className="text-xs text-purple-700 max-h-20 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                    <ReactMarkdown>
+                      {session.phases.architect.outputs.find(o => o.type === 'architecture').content.slice(0, 200)}...
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {session.phases?.designArchitect?.outputs?.length > 0 && (
+                <div className="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 rounded-lg p-3">
+                  <h5 className="font-medium text-pink-900 mb-2 flex items-center text-sm">
+                    🎨 Frontend Design
+                    <span className="ml-1 px-1 py-0.5 bg-pink-100 text-pink-800 text-xs rounded">
+                      Design
+                    </span>
+                  </h5>
+                  <div className="text-xs text-pink-700 max-h-20 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                    <ReactMarkdown>
+                      {session.phases.designArchitect.outputs[0].content.slice(0, 200)}...
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {session.phases?.po?.outputs?.find(o => o.type === 'po-validation') && (
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-3">
+                  <h5 className="font-medium text-blue-900 mb-2 flex items-center text-sm">
+                    ✅ PO Validation
+                    <span className="ml-1 px-1 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">
+                      PO
+                    </span>
+                  </h5>
+                  <div className="text-xs text-blue-700 max-h-20 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                    <ReactMarkdown>
+                      {session.phases.po.outputs.find(o => o.type === 'po-validation').content.slice(0, 200)}...
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 📊 Complete Context Status */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <h5 className="font-medium text-blue-900 mb-2">📊 Story Creation Context Status:</h5>
+              <div className="flex flex-wrap gap-1">
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  session.phases?.analyst?.outputs?.length > 0
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  ✓ Business Vision
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  session.phases?.pm?.outputs?.length > 0
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  ✓ Product Requirements
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  session.phases?.architect?.outputs?.length > 0
+                    ? 'bg-purple-100 text-purple-800'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  ✓ Technical Architecture
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  session.phases?.designArchitect?.outputs?.length > 0
+                    ? 'bg-pink-100 text-pink-800'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  ✓ Frontend Design
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  session.phases?.po?.outputs?.length > 0
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  ✓ PO Validation
+                </span>
+                <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                  🎯 Current: User Stories
+                </span>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Generated Stories */}
-          {stories.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-lg font-semibold text-gray-900">
-                  Generated Stories ({stories.length})
-                </h4>
-                {stories.length >= 3 && (
-                  <button
-                    onClick={handleProceedToValidation}
-                    className="btn btn-primary"
-                  >
-                    Proceed to Validation
-                  </button>
-                )}
-              </div>
-              
-              <div className="grid gap-4">
-                {stories.map((story) => (
-                  <div key={story.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium text-gray-900">{story.title}</h5>
-                      <button
-                        onClick={() => handleRemoveStory(story.id)}
-                        className="text-red-600 hover:text-red-800 text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    <DocumentPreview
-                      title={story.title}
-                      content={story.content}
-                      filename={story.filename}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {stories.length === 0 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-              <p className="text-gray-600">No stories created yet. Use the form above to create your first user story.</p>
-            </div>
-          )}
+          <AIChat
+            agentId="role-scrum-master-agent"
+            phase="sm"
+            context={chatContext}
+            onContentGenerated={handleContentGenerated}
+          />
         </div>
       )}
 
-      {step === 'validation' && (
+      {step === 'validation' && generatedContent && (
         <div className="space-y-6">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-2">Stories Summary</h4>
-            <p className="text-sm text-gray-600">
-              {stories.length} user stories created and ready for validation
-            </p>
+          <DocumentPreview
+            title="User Stories Document"
+            content={generatedContent}
+            filename={`${session.projectName.toLowerCase().replace(/\s+/g, '-')}-user-stories.md`}
+          />
+
+          <div className="flex justify-center">
+            <button
+              onClick={() => setStep('chat')}
+              className="btn btn-secondary mr-4"
+            >
+              ← Back to Chat
+            </button>
           </div>
-          
+
           <ChecklistValidator
             checklistName="story-definition-of-done-(dod)-checklist.md"
             title="Story Definition of Done Checklist"
@@ -311,7 +318,7 @@ export default function SMPhase({ session, phaseData, onComplete, onDataUpdate }
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <h4 className="font-medium text-gray-900 mb-2">Generated Stories</h4>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• {stories.length} user stories created</li>
+                <li>• Comprehensive user stories document created</li>
                 <li>• All stories validated</li>
                 <li>• Ready for development sprint</li>
               </ul>

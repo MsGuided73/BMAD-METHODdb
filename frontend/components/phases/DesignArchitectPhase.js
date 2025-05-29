@@ -169,41 +169,96 @@ export default function DesignArchitectPhase({ session, phaseData, onComplete, o
             </ul>
           </div>
 
-          {/* Show System Architecture Context */}
-          {session.phases?.architect?.outputs?.find(o => o.type === 'architecture') && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">System Architecture Reference</h4>
-              <div className="text-sm text-gray-700 max-h-32 overflow-y-auto">
-                <ReactMarkdown>
-                  {session.phases.architect.outputs.find(o => o.type === 'architecture').content.slice(0, 500)}...
-                </ReactMarkdown>
+          {/* 🎨 Enhanced Context Display Grid */}
+          <div className="grid md:grid-cols-3 gap-4">
+            {session.phases?.architect?.outputs?.find(o => o.type === 'architecture') && (
+              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
+                <h4 className="font-medium text-purple-900 mb-3 flex items-center">
+                  🏗️ System Architecture
+                  <span className="ml-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                    From Architect Phase
+                  </span>
+                </h4>
+                <div className="text-sm text-purple-700 max-h-28 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                  <ReactMarkdown>
+                    {session.phases.architect.outputs.find(o => o.type === 'architecture').content.slice(0, 400)}...
+                  </ReactMarkdown>
+                </div>
+                <div className="mt-2 text-xs text-purple-600">
+                  💡 Backend architecture foundation
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Show PRD Context */}
-          {session.phases?.pm?.outputs?.find(o => o.type === 'prd') && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">PRD Reference</h4>
-              <div className="text-sm text-gray-700 max-h-32 overflow-y-auto">
-                <ReactMarkdown>
-                  {session.phases.pm.outputs.find(o => o.type === 'prd').content.slice(0, 500)}...
-                </ReactMarkdown>
+            {session.phases?.pm?.outputs?.find(o => o.type === 'prd') && (
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4">
+                <h4 className="font-medium text-orange-900 mb-3 flex items-center">
+                  📋 PRD Context
+                  <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                    From PM Phase
+                  </span>
+                </h4>
+                <div className="text-sm text-orange-700 max-h-28 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                  <ReactMarkdown>
+                    {session.phases.pm.outputs.find(o => o.type === 'prd').content.slice(0, 400)}...
+                  </ReactMarkdown>
+                </div>
+                <div className="mt-2 text-xs text-orange-600">
+                  💡 Feature requirements
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Show Project Brief Context */}
-          {session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief') && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Project Brief Reference</h4>
-              <div className="text-sm text-gray-700 max-h-32 overflow-y-auto">
-                <ReactMarkdown>
-                  {session.phases.analyst.outputs.find(o => o.type === 'project-brief').content.slice(0, 500)}...
-                </ReactMarkdown>
+            {session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief') && (
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-medium text-green-900 mb-3 flex items-center">
+                  📋 Project Brief
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    From Analyst Phase
+                  </span>
+                </h4>
+                <div className="text-sm text-green-700 max-h-28 overflow-y-auto bg-white bg-opacity-50 rounded p-2">
+                  <ReactMarkdown>
+                    {session.phases.analyst.outputs.find(o => o.type === 'project-brief').content.slice(0, 400)}...
+                  </ReactMarkdown>
+                </div>
+                <div className="mt-2 text-xs text-green-600">
+                  💡 Business vision
+                </div>
               </div>
+            )}
+          </div>
+
+          {/* 📊 Context Status Indicator */}
+          <div className="bg-pink-50 border border-pink-200 rounded-lg p-3">
+            <h5 className="font-medium text-pink-900 mb-2">📊 Available Context:</h5>
+            <div className="flex flex-wrap gap-2">
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                session.phases?.analyst?.outputs?.length > 0
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-500'
+              }`}>
+                ✓ Project Brief
+              </span>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                session.phases?.pm?.outputs?.length > 0
+                  ? 'bg-orange-100 text-orange-800'
+                  : 'bg-gray-100 text-gray-500'
+              }`}>
+                ✓ PRD
+              </span>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                session.phases?.architect?.outputs?.length > 0
+                  ? 'bg-purple-100 text-purple-800'
+                  : 'bg-gray-100 text-gray-500'
+              }`}>
+                ✓ System Architecture
+              </span>
+              <span className="px-2 py-1 text-xs rounded-full bg-pink-100 text-pink-800">
+                🎯 Current: Frontend Design
+              </span>
             </div>
-          )}
+          </div>
 
           <AIChat
             agentId="role-design-architect-uiux-&-frontend-strategy-expert"

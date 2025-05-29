@@ -10,9 +10,29 @@ export default function PMPhase({ session, phaseData, onComplete, onDataUpdate }
   const [generatedContent, setGeneratedContent] = useState(phaseData.generatedContent || '');
   const [checklistData, setChecklistData] = useState(phaseData.checklistData || null);
 
+  // 🏭 Extract industry insights from project brief
+  const getIndustryInsights = () => {
+    const projectBrief = session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief')?.content || '';
+    const projectName = session.projectName.toLowerCase();
+
+    if (projectName.includes('ecommerce') || projectName.includes('shop') || projectBrief.toLowerCase().includes('ecommerce')) {
+      return { industry: 'E-commerce', focus: 'Payment flows, inventory management, user conversion' };
+    } else if (projectName.includes('fintech') || projectName.includes('finance') || projectBrief.toLowerCase().includes('fintech')) {
+      return { industry: 'FinTech', focus: 'Security, compliance, real-time transactions' };
+    } else if (projectName.includes('health') || projectName.includes('medical') || projectBrief.toLowerCase().includes('health')) {
+      return { industry: 'HealthTech', focus: 'HIPAA compliance, patient workflows, data security' };
+    } else if (projectName.includes('education') || projectName.includes('learning') || projectBrief.toLowerCase().includes('education')) {
+      return { industry: 'EdTech', focus: 'Student privacy, accessibility, learning outcomes' };
+    }
+    return { industry: 'General', focus: 'User experience, scalability, performance' };
+  };
+
+  const industryInsights = getIndustryInsights();
+
   const chatContext = {
     projectName: session.projectName,
     projectBrief: session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief')?.content || '',
+    industryInsights,
     phase: 'pm',
     sessionId: session.id
   };
@@ -130,17 +150,64 @@ export default function PMPhase({ session, phaseData, onComplete, onDataUpdate }
             </ul>
           </div>
 
-          {/* Show Project Brief Context */}
-          {session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief') && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Project Brief Reference</h4>
-              <div className="text-sm text-gray-700 max-h-32 overflow-y-auto">
-                <ReactMarkdown>
-                  {session.phases.analyst.outputs.find(o => o.type === 'project-brief').content.slice(0, 500)}...
-                </ReactMarkdown>
+          {/* 📋 Enhanced Context Display */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {session.phases?.analyst?.outputs?.find(o => o.type === 'project-brief') && (
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-medium text-green-900 mb-3 flex items-center">
+                  📋 Project Brief Context
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    From Analyst Phase
+                  </span>
+                </h4>
+                <div className="text-sm text-green-700 max-h-32 overflow-y-auto bg-white bg-opacity-50 rounded p-3">
+                  <ReactMarkdown>
+                    {session.phases.analyst.outputs.find(o => o.type === 'project-brief').content.slice(0, 600)}...
+                  </ReactMarkdown>
+                </div>
+                <div className="mt-2 text-xs text-green-600">
+                  💡 Business vision and project objectives
+                </div>
+              </div>
+            )}
+
+            {/* 🏭 Industry Insights Panel */}
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
+              <h4 className="font-medium text-purple-900 mb-3 flex items-center">
+                🏭 Industry Focus: {industryInsights.industry}
+                <span className="ml-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  PM Considerations
+                </span>
+              </h4>
+              <div className="text-sm text-purple-700 bg-white bg-opacity-50 rounded p-3">
+                <p className="font-medium mb-2">Key PM Focus Areas:</p>
+                <p>{industryInsights.focus}</p>
+              </div>
+              <div className="mt-2 text-xs text-purple-600">
+                💡 Industry-specific requirements to consider in PRD
               </div>
             </div>
-          )}
+          </div>
+
+          {/* 📊 Context Status Indicator */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <h5 className="font-medium text-blue-900 mb-2">📊 Available Context:</h5>
+            <div className="flex flex-wrap gap-2">
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                session.phases?.analyst?.outputs?.length > 0
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-500'
+              }`}>
+                ✓ Project Brief
+              </span>
+              <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                ✓ Industry Insights
+              </span>
+              <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                🎯 Current: PRD Creation
+              </span>
+            </div>
+          </div>
 
           <AIChat
             agentId="role-product-manager-(pm)-agent"
