@@ -1,0 +1,43 @@
+{
+  "id": "b4791ea4-a0b8-47d3-b2d6-e3aba6ddb1b0",
+  "projectName": "WriteThisWay",
+  "createdAt": "2025-05-29T05:45:30.126Z",
+  "updatedAt": "2025-05-29T05:45:30.126Z",
+  "currentPhase": "analyst",
+  "phases": {
+    "analyst": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "pm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "architect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "designArchitect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "po": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "sm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    }
+  },
+  "globalData": {
+    "projectName": "WriteThisWay"
+  },
+  "generatedFiles": []
+}

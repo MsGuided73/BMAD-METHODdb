@@ -1,0 +1,8 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/wizard/[sessionId]": "pages/wizard/[sessionId].js",
+  "/": "pages/index.js",
+  "/agents": "pages/agents.js"
+}

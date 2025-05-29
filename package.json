@@ -1,0 +1,20 @@
+{
+  "name": "bmad-planning-app",
+  "version": "1.0.0",
+  "description": "BMAD Method Planning Application - Guided workflow for AI-driven development planning",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && node server.js",
+    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js",
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "keywords": ["bmad", "agile", "ai-development", "planning", "methodology"],
+  "author": "BMAD Method Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "21bab7de-f4ae-4a1e-8038-686caf665a98",
+  "projectName": "Idea Catcher",
+  "createdAt": "2025-05-29T07:33:15.484Z",
+  "updatedAt": "2025-05-29T07:33:15.484Z",
+  "currentPhase": "analyst",
+  "phases": {
+    "analyst": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "pm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "architect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "designArchitect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "po": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "sm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    }
+  },
+  "globalData": {
+    "projectName": "Idea Catcher"
+  },
+  "generatedFiles": []
+}
