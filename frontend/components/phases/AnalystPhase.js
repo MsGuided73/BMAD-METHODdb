@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AIChat from '../AIChat';
 import DocumentPreview from '../DocumentPreview';
 import { DocumentIcon, CheckIcon, ChatIcon } from '../Icons';
@@ -6,6 +6,7 @@ import { DocumentIcon, CheckIcon, ChatIcon } from '../Icons';
 export default function AnalystPhase({ session, phaseData, onComplete, onDataUpdate }) {
   const [mode, setMode] = useState('chat'); // chat, preview, complete
   const [generatedContent, setGeneratedContent] = useState(phaseData.generatedContent || '');
+  const aiChatRef = useRef();
 
   // 🏭 INDUSTRY-SPECIFIC CONTEXT - Enhanced context for better business analysis
   const getIndustryContext = (projectName) => {
@@ -112,6 +113,12 @@ export default function AnalystPhase({ session, phaseData, onComplete, onDataUpd
       templateName,
       mode: 'preview'
     });
+  };
+
+  const handleGenerateTemplate = async () => {
+    if (aiChatRef.current && aiChatRef.current.generateTemplate) {
+      await aiChatRef.current.generateTemplate('project-brief');
+    }
   };
 
   const handleCompletePhase = () => {
@@ -228,7 +235,25 @@ export default function AnalystPhase({ session, phaseData, onComplete, onDataUpd
             phase="analyst"
             context={chatContext}
             onContentGenerated={handleContentGenerated}
+            ref={aiChatRef}
           />
+
+          {/* 🚀 Template Generation Button */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium text-blue-900 mb-1">Ready to Generate Project Brief?</h4>
+                <p className="text-sm text-blue-700">Click below to generate and save your project brief template</p>
+              </div>
+              <button
+                onClick={handleGenerateTemplate}
+                className="btn btn-primary"
+                disabled={!chatContext.projectName}
+              >
+                Generate Project Brief
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

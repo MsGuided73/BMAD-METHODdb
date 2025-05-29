@@ -16,9 +16,15 @@ export default function TemplatesPage() {
     try {
       const response = await fetch('/api/templates');
       const data = await response.json();
-      setTemplates(data.templates || []);
+      if (data.success) {
+        setTemplates(data.data || []);
+      } else {
+        console.error('Failed to load templates:', data.error);
+        setTemplates([]);
+      }
     } catch (error) {
       console.error('Failed to load templates:', error);
+      setTemplates([]);
     } finally {
       setLoading(false);
     }
@@ -26,9 +32,23 @@ export default function TemplatesPage() {
 
   const handleViewTemplate = async (templateName) => {
     try {
-      const response = await fetch(`/api/templates/${encodeURIComponent(templateName)}`);
-      const data = await response.json();
-      setSelectedTemplate(data);
+      // Get template content
+      const contentResponse = await fetch(`/api/templates/${encodeURIComponent(templateName)}/raw`);
+      const contentData = await contentResponse.json();
+
+      // Get template schema for placeholders info
+      const schemaResponse = await fetch(`/api/templates/${encodeURIComponent(templateName)}/schema`);
+      const schemaData = await schemaResponse.json();
+
+      if (contentData.success && schemaData.success) {
+        setSelectedTemplate({
+          name: templateName,
+          content: contentData.data.content,
+          placeholders: schemaData.data.fields || []
+        });
+      } else {
+        console.error('Failed to load template data');
+      }
     } catch (error) {
       console.error('Failed to load template:', error);
     }
@@ -45,12 +65,13 @@ export default function TemplatesPage() {
 
   const getTemplateCategory = (templateName) => {
     const name = templateName.toLowerCase();
-    if (name.includes('project-brief')) return 'project-brief';
-    if (name.includes('prd') || name.includes('requirements')) return 'prd';
+    if (name.includes('project-brief') || name.includes('brief')) return 'project-brief';
+    if (name.includes('prd') || name.includes('product-requirements') || name.includes('requirements')) return 'prd';
     if (name.includes('architecture') && !name.includes('frontend')) return 'architecture';
-    if (name.includes('frontend')) return 'frontend';
-    if (name.includes('uiux') || name.includes('ui-ux')) return 'uiux';
-    if (name.includes('story')) return 'story';
+    if (name.includes('frontend-architecture') || name.includes('frontend')) return 'frontend';
+    if (name.includes('uiux') || name.includes('ui-ux') || name.includes('specification')) return 'uiux';
+    if (name.includes('story') || name.includes('epic')) return 'story';
+    if (name.includes('sharding') || name.includes('document-sharding')) return 'other';
     return 'other';
   };
 
@@ -69,7 +90,7 @@ export default function TemplatesPage() {
         <title>BMAD Templates - Planning Application</title>
         <meta name="description" content="Browse and explore BMAD Method templates for project planning" />
       </Head>
-      
+
       <Layout>
         <div className="min-h-screen bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -120,7 +141,7 @@ export default function TemplatesPage() {
                                       {template.name.replace(/\.md$/, '').replace(/-/g, ' ')}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                      {template.placeholders?.length || 0} fields
+                                      Template file
                                     </div>
                                   </div>
                                 </div>
@@ -156,16 +177,26 @@ export default function TemplatesPage() {
                         <div className="p-4 border-b border-gray-200">
                           <h3 className="text-md font-medium text-gray-900 mb-3">Template Fields</h3>
                           <div className="grid md:grid-cols-2 gap-3">
-                            {selectedTemplate.placeholders.map((placeholder, index) => (
-                              <div key={index} className="bg-gray-50 rounded-lg p-3">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {placeholder.replace(/[{}]/g, '').replace(/-/g, ' ')}
+                            {selectedTemplate.placeholders.map((placeholder, index) => {
+                              // Handle both string placeholders and field objects
+                              const fieldName = typeof placeholder === 'string'
+                                ? placeholder.replace(/[{}]/g, '').replace(/-/g, ' ')
+                                : placeholder.label || placeholder.name || 'Unknown Field';
+                              const fieldType = typeof placeholder === 'object'
+                                ? placeholder.type || 'text'
+                                : 'text';
+
+                              return (
+                                <div key={index} className="bg-gray-50 rounded-lg p-3">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {fieldName}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {fieldType} field
+                                  </div>
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1">
-                                  Dynamic field
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -199,7 +230,7 @@ export default function TemplatesPage() {
             <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-blue-900 mb-2">About BMAD Templates</h3>
               <p className="text-blue-800 mb-4">
-                These templates are the foundation of the BMAD Method planning process. Each template contains 
+                These templates are the foundation of the BMAD Method planning process. Each template contains
                 dynamic placeholders that are filled during the planning wizard to create comprehensive project documentation.
               </p>
               <div className="grid md:grid-cols-2 gap-4">

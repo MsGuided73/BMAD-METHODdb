@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SparklesIcon, SendIcon, LoadingIcon, CopyIcon, ExpandIcon, CompressIcon } from './Icons';
 
-export default function AIChat({ agentId, phase, context = {}, onContentGenerated }) {
+const AIChat = forwardRef(function AIChat({ agentId, phase, context = {}, onContentGenerated }, ref) {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -157,6 +157,11 @@ export default function AIChat({ agentId, phase, context = {}, onContentGenerate
       setIsLoading(false);
     }
   };
+
+  // Expose generateTemplate function to parent components
+  useImperativeHandle(ref, () => ({
+    generateTemplate
+  }));
 
   const getSuggestions = async () => {
     setIsLoading(true);
@@ -415,4 +420,6 @@ ${messages.map(message => {
     </div>
     </>
   );
-}
+});
+
+export default AIChat;
