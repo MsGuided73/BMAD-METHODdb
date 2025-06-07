@@ -1,0 +1,43 @@
+{
+  "id": "92300cc0-d951-4390-b9de-dd4ddbd909e5",
+  "projectName": "Test Project",
+  "createdAt": "2025-05-29T23:59:34.019Z",
+  "updatedAt": "2025-05-29T23:59:34.019Z",
+  "currentPhase": "analyst",
+  "phases": {
+    "analyst": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "pm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "architect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "designArchitect": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "po": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    },
+    "sm": {
+      "completed": false,
+      "data": {},
+      "outputs": []
+    }
+  },
+  "globalData": {
+    "projectName": "Test Project"
+  },
+  "generatedFiles": []
+}

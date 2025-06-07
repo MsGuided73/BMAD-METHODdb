@@ -14,7 +14,8 @@ export default function TemplatesPage() {
 
   const loadTemplates = async () => {
     try {
-      const response = await fetch('/api/templates');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/templates`);
       const data = await response.json();
       if (data.success) {
         setTemplates(data.data || []);
@@ -32,12 +33,14 @@ export default function TemplatesPage() {
 
   const handleViewTemplate = async (templateName) => {
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
       // Get template content
-      const contentResponse = await fetch(`/api/templates/${encodeURIComponent(templateName)}/raw`);
+      const contentResponse = await fetch(`${apiUrl}/api/templates/${encodeURIComponent(templateName)}/raw`);
       const contentData = await contentResponse.json();
 
       // Get template schema for placeholders info
-      const schemaResponse = await fetch(`/api/templates/${encodeURIComponent(templateName)}/schema`);
+      const schemaResponse = await fetch(`${apiUrl}/api/templates/${encodeURIComponent(templateName)}/schema`);
       const schemaData = await schemaResponse.json();
 
       if (contentData.success && schemaData.success) {

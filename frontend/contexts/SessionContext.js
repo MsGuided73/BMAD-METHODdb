@@ -1,6 +1,9 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 
+// Get API base URL
+const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 const SessionContext = createContext();
 
 // Session state management
@@ -23,10 +26,10 @@ function sessionReducer(state, action) {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
-    
+
     case 'SET_SESSION':
       return {
         ...state,
@@ -36,7 +39,7 @@ function sessionReducer(state, action) {
         loading: false,
         error: null
       };
-    
+
     case 'UPDATE_PHASE':
       return {
         ...state,
@@ -48,7 +51,7 @@ function sessionReducer(state, action) {
           }
         }
       };
-    
+
     case 'COMPLETE_PHASE':
       return {
         ...state,
@@ -63,10 +66,10 @@ function sessionReducer(state, action) {
         },
         currentPhase: action.payload.nextPhase
       };
-    
+
     case 'RESET_SESSION':
       return initialState;
-    
+
     default:
       return state;
   }
@@ -80,10 +83,12 @@ export function SessionProvider({ children }) {
     async createSession(projectName) {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
-        const response = await axios.post('/api/sessions', { projectName });
+        const apiUrl = getApiUrl();
+        const response = await axios.post(`${apiUrl}/api/sessions`, { projectName });
         dispatch({ type: 'SET_SESSION', payload: response.data.data });
         return response.data.data;
       } catch (error) {
+        console.error('Session creation error:', error);
         dispatch({ type: 'SET_ERROR', payload: error.response?.data?.message || 'Failed to create session' });
         throw error;
       }
@@ -92,7 +97,8 @@ export function SessionProvider({ children }) {
     async loadSession(sessionId) {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
-        const response = await axios.get(`/api/sessions/${sessionId}`);
+        const apiUrl = getApiUrl();
+        const response = await axios.get(`${apiUrl}/api/sessions/${sessionId}`);
         dispatch({ type: 'SET_SESSION', payload: response.data.data });
         return response.data.data;
       } catch (error) {
@@ -103,7 +109,8 @@ export function SessionProvider({ children }) {
 
     async updateSession(sessionId, updates) {
       try {
-        const response = await axios.put(`/api/sessions/${sessionId}`, updates);
+        const apiUrl = getApiUrl();
+        const response = await axios.put(`${apiUrl}/api/sessions/${sessionId}`, updates);
         dispatch({ type: 'SET_SESSION', payload: response.data.data });
         return response.data.data;
       } catch (error) {
@@ -118,14 +125,14 @@ export function SessionProvider({ children }) {
           data,
           outputs
         });
-        dispatch({ 
-          type: 'COMPLETE_PHASE', 
-          payload: { 
-            phase, 
-            data, 
-            outputs, 
-            nextPhase: response.data.nextPhase 
-          } 
+        dispatch({
+          type: 'COMPLETE_PHASE',
+          payload: {
+            phase,
+            data,
+            outputs,
+            nextPhase: response.data.nextPhase
+          }
         });
         return response.data;
       } catch (error) {

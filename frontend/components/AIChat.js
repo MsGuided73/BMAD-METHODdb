@@ -70,7 +70,8 @@ const AIChat = forwardRef(function AIChat({ agentId, phase, context = {}, onCont
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +118,8 @@ const AIChat = forwardRef(function AIChat({ agentId, phase, context = {}, onCont
   const generateTemplate = async (templateName) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/ai/generate-template', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/ai/generate-template`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +168,8 @@ const AIChat = forwardRef(function AIChat({ agentId, phase, context = {}, onCont
   const getSuggestions = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/ai/suggestions', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/ai/suggestions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

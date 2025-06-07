@@ -14,7 +14,8 @@ export default function AgentsPage() {
 
   const loadAgents = async () => {
     try {
-      const response = await fetch('/api/agents');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/agents`);
       const data = await response.json();
       setAgents(data.data || []);
     } catch (error) {
@@ -26,7 +27,8 @@ export default function AgentsPage() {
 
   const handleViewAgent = async (agentName) => {
     try {
-      const response = await fetch(`/api/agents/${encodeURIComponent(agentName)}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/agents/${encodeURIComponent(agentName)}`);
       const data = await response.json();
       setSelectedAgent(data);
     } catch (error) {
