@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Layout from '../components/Layout';
+import { GradientButton } from '../components/ui/gradient-button';
 import { DocumentIcon, EyeIcon } from '../components/Icons';
 
 export default function TemplatesPage() {
@@ -231,11 +232,24 @@ export default function TemplatesPage() {
 
             {/* Template Info */}
             <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">About BMAD Templates</h3>
-              <p className="text-blue-800 mb-4">
-                These templates are the foundation of the BMAD Method planning process. Each template contains
-                dynamic placeholders that are filled during the planning wizard to create comprehensive project documentation.
-              </p>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">About BMAD Templates</h3>
+                  <p className="text-blue-800 mb-4 md:mb-0">
+                    These templates are the foundation of the BMAD Method planning process. Each template contains
+                    dynamic placeholders that are filled during the planning wizard to create comprehensive project documentation.
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <GradientButton
+                    variant="variant"
+                    onClick={() => window.location.href = '/'}
+                    className="px-6 py-3"
+                  >
+                    Start Planning
+                  </GradientButton>
+                </div>
+              </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-medium text-blue-900 mb-2">Template Features</h4>

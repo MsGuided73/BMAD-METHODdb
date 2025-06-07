@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useSession } from '../contexts/SessionContext';
 import Layout from '../components/Layout';
+import { GradientButton } from '../components/ui/gradient-button';
 
 // Using inline SVG icons for compatibility
 const PlayIcon = ({ className }) => (
@@ -114,10 +115,10 @@ export default function Home() {
                         required
                       />
                     </div>
-                    <button
+                    <GradientButton
                       type="submit"
                       disabled={loading || !projectName.trim()}
-                      className="btn btn-primary btn-lg w-full shadow-glow"
+                      className="w-full px-8 py-4 text-lg"
                     >
                       {loading ? (
                         <div className="flex items-center">
@@ -130,7 +131,7 @@ export default function Home() {
                           Start Planning
                         </div>
                       )}
-                    </button>
+                    </GradientButton>
                   </form>
                 </div>
               </div>
@@ -198,12 +199,13 @@ export default function Home() {
               <p className="text-xl text-primary-100 mb-8">
                 Join the AI-driven development revolution with the BMAD Method
               </p>
-              <button
+              <GradientButton
+                variant="variant"
                 onClick={() => document.querySelector('input').focus()}
-                className="btn bg-white text-primary-600 hover:bg-gray-50 btn-lg shadow-lg"
+                className="px-8 py-4 text-lg"
               >
                 Get Started Now
-              </button>
+              </GradientButton>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from '../contexts/SessionContext';
+import { GradientButton } from './ui/gradient-button';
 
 // Using Heroicons v1 syntax for compatibility
 const Bars3Icon = ({ className }) => (
@@ -94,11 +95,10 @@ export default function Layout({ children, showNavigation = true }) {
                 })}
 
                 {session && (
-                  <Link
-                    href={`/wizard/${session.id}`}
-                    className="btn btn-primary btn-sm"
-                  >
-                    Continue Planning
+                  <Link href={`/wizard/${session.id}`}>
+                    <GradientButton className="px-6 py-2 text-sm">
+                      Continue Planning
+                    </GradientButton>
                   </Link>
                 )}
               </div>

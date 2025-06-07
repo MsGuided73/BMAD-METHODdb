@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Layout from '../components/Layout';
+import { GradientButton } from '../components/ui/gradient-button';
 import { CogIcon, UserIcon, SparklesIcon } from '../components/Icons';
 
 export default function AgentsPage() {
@@ -238,12 +239,24 @@ export default function AgentsPage() {
 
             {/* Agent Info */}
             <div className="mt-8 bg-purple-50 border border-purple-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-purple-900 mb-2">About AI Development Agents</h3>
-              <p className="text-purple-800 mb-4">
-                These specialized AI agents are designed to work with your BMAD-generated documentation to automate
-                various aspects of software development. Each agent has specific expertise and can be used with
-                popular AI coding tools.
-              </p>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-900 mb-2">About AI Development Agents</h3>
+                  <p className="text-purple-800 mb-4 md:mb-0">
+                    These specialized AI agents are designed to work with your BMAD-generated documentation to automate
+                    various aspects of software development. Each agent has specific expertise and can be used with
+                    popular AI coding tools.
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <GradientButton
+                    onClick={() => window.location.href = '/'}
+                    className="px-6 py-3"
+                  >
+                    Start Planning
+                  </GradientButton>
+                </div>
+              </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-medium text-purple-900 mb-2">Agent Features</h4>
