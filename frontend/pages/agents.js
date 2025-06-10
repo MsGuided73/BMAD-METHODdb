@@ -26,12 +26,16 @@ export default function AgentsPage() {
     }
   };
 
-  const handleViewAgent = async (agentName) => {
+  const handleViewAgent = async (agentId) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/agents/${encodeURIComponent(agentName)}`);
+      const response = await fetch(`${apiUrl}/api/agents/${encodeURIComponent(agentId)}`);
       const data = await response.json();
-      setSelectedAgent(data);
+      if (data.success) {
+        setSelectedAgent(data.data);
+      } else {
+        console.error('Failed to load agent:', data.error);
+      }
     } catch (error) {
       console.error('Failed to load agent:', error);
     }
@@ -47,6 +51,7 @@ export default function AgentsPage() {
   };
 
   const getAgentCategory = (agentName) => {
+    if (!agentName || typeof agentName !== 'string') return 'other';
     const name = agentName.toLowerCase();
     if (name.includes('backend') || name.includes('api')) return 'backend';
     if (name.includes('frontend') || name.includes('ui') || name.includes('react')) return 'frontend';
@@ -145,10 +150,10 @@ export default function AgentsPage() {
                             <div className="divide-y divide-gray-200">
                               {categoryAgents.map((agent) => (
                                 <button
-                                  key={agent.name}
-                                  onClick={() => handleViewAgent(agent.name)}
+                                  key={agent.id}
+                                  onClick={() => handleViewAgent(agent.id)}
                                   className={`w-full text-left p-3 hover:bg-gray-50 transition-colors ${
-                                    selectedAgent?.name === agent.name ? 'bg-primary-50 border-r-2 border-primary-500' : ''
+                                    selectedAgent?.id === agent.id ? 'bg-primary-50 border-r-2 border-primary-500' : ''
                                   }`}
                                 >
                                   <div className="flex items-center">
@@ -180,18 +185,18 @@ export default function AgentsPage() {
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                       <div className="p-6 border-b border-gray-200">
                         <div className="flex items-center">
-                          <div className={`w-12 h-12 rounded-full bg-${getAgentColor(getAgentCategory(selectedAgent.name))}-100 flex items-center justify-center mr-4`}>
+                          <div className={`w-12 h-12 rounded-full bg-${getAgentColor(getAgentCategory(selectedAgent.name || selectedAgent.role))}-100 flex items-center justify-center mr-4`}>
                             {(() => {
-                              const IconComponent = getAgentIcon(getAgentCategory(selectedAgent.name));
-                              return <IconComponent className={`h-6 w-6 text-${getAgentColor(getAgentCategory(selectedAgent.name))}-600`} />;
+                              const IconComponent = getAgentIcon(getAgentCategory(selectedAgent.name || selectedAgent.role));
+                              return <IconComponent className={`h-6 w-6 text-${getAgentColor(getAgentCategory(selectedAgent.name || selectedAgent.role))}-600`} />;
                             })()}
                           </div>
                           <div>
                             <h2 className="text-xl font-semibold text-gray-900">
-                              {selectedAgent.name.replace(/\.md$/, '').replace(/-/g, ' ')}
+                              {(selectedAgent.name || selectedAgent.role || '').replace(/\.md$/, '').replace(/-/g, ' ')}
                             </h2>
                             <p className="text-gray-600">
-                              {selectedAgent.expertise || 'Specialized Development Agent'}
+                              {selectedAgent.description || 'Specialized Development Agent'}
                             </p>
                           </div>
                         </div>
@@ -217,7 +222,7 @@ export default function AgentsPage() {
                         <h3 className="text-lg font-medium text-gray-900 mb-3">Agent Prompt</h3>
                         <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
                           <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
-                            {selectedAgent.content}
+                            {selectedAgent.rawContent || selectedAgent.content || 'No content available'}
                           </pre>
                         </div>
                       </div>
