@@ -43,6 +43,7 @@ app.use('/api/generator', require('./routes/generator'));
 app.use('/api/sessions', require('./routes/sessions-enhanced')); // Use enhanced sessions with auth support
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/knowledge-base', require('./routes/knowledge-base')); // Knowledge base for voice agent
+app.use('/api/projects', require('./routes/projects')); // Project dashboard with Airtable integration
 
 // Health check
 app.get('/api/health', (req, res) => {

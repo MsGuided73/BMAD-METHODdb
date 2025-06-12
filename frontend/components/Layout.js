@@ -2,7 +2,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from '../contexts/SessionContext';
+import { useAuth } from '../contexts/AuthContext';
 import { GradientButton } from './ui/gradient-button';
+import AuthModal from './auth/AuthModal';
+import TrialStatus from './auth/TrialStatus';
 
 // Using Heroicons v1 syntax for compatibility
 const Bars3Icon = ({ className }) => (
@@ -44,11 +47,15 @@ const ExclamationTriangleIcon = ({ className }) => (
 
 export default function Layout({ children, showNavigation = true }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
   const { session, error } = useSession();
+  const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
 
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
+    ...(isAuthenticated ? [{ name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon }] : []),
     { name: 'Templates', href: '/templates', icon: DocumentTextIcon },
     { name: 'Agents', href: '/agents', icon: CogIcon },
   ];
@@ -93,6 +100,42 @@ export default function Layout({ children, showNavigation = true }) {
                     </Link>
                   );
                 })}
+
+                {/* Authentication Section */}
+                {isAuthenticated ? (
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-600">
+                      Welcome, {user?.firstName || user?.email}
+                    </span>
+                    <button
+                      onClick={logout}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => {
+                        setAuthMode('login');
+                        setAuthModalOpen(true);
+                      }}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      Login
+                    </button>
+                    <GradientButton
+                      onClick={() => {
+                        setAuthMode('register');
+                        setAuthModalOpen(true);
+                      }}
+                      className="px-4 py-2 text-sm"
+                    >
+                      Sign Up
+                    </GradientButton>
+                  </div>
+                )}
 
                 {session && (
                   <Link href={`/wizard/${session.id}`}>
@@ -142,6 +185,49 @@ export default function Layout({ children, showNavigation = true }) {
                   );
                 })}
 
+                {/* Mobile Authentication */}
+                {isAuthenticated ? (
+                  <div className="border-t border-gray-200 pt-2">
+                    <div className="px-3 py-2 text-sm text-gray-600">
+                      Welcome, {user?.firstName || user?.email}
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full text-left"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-t border-gray-200 pt-2 space-y-1">
+                    <button
+                      onClick={() => {
+                        setAuthMode('login');
+                        setAuthModalOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full text-left"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => {
+                        setAuthMode('register');
+                        setAuthModalOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:bg-primary-50 w-full text-left"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                )}
+
+
+
                 {session && (
                   <Link
                     href={`/wizard/${session.id}`}
@@ -156,6 +242,9 @@ export default function Layout({ children, showNavigation = true }) {
           )}
         </nav>
       )}
+
+      {/* Trial Status Banner */}
+      <TrialStatus />
 
       {/* Error Banner */}
       {error && (
@@ -175,6 +264,13 @@ export default function Layout({ children, showNavigation = true }) {
       <main className="flex-1">
         {children}
       </main>
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        defaultMode={authMode}
+      />
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200">

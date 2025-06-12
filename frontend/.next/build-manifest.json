@@ -27,15 +27,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/agents": [
+    "/wizard/[sessionId]": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/agents.js"
-    ],
-    "/templates": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/templates.js"
+      "static/chunks/pages/wizard/[sessionId].js"
     ]
   },
   "ampFirstPages": []
