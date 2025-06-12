@@ -1,0 +1,22 @@
+{
+  "id": "template-sync-template-template-2025-06-11T19-47-21-668Z",
+  "sessionId": "template-sync",
+  "projectName": "BMAD Templates",
+  "phase": "template",
+  "documentType": "template",
+  "content": "## Introduction / Problem Statement\r\n\r\n{Describe the core idea, the problem being solved, or the opportunity being addressed. Why is this project needed?}\r\n\r\n## Vision & Goals\r\n\r\n- **Vision:** {Describe the high-level desired future state or impact of this project.}\r\n- **Primary Goals:** {List 2-5 specific, measurable, achievable, relevant, time-bound (SMART) goals for the Minimum Viable Product (MVP).}\r\n  - Goal 1: ...\r\n  - Goal 2: ...\r\n- **Success Metrics (Initial Ideas):** {How will we measure if the project/MVP is successful? List potential KPIs.}\r\n\r\n## Target Audience / Users\r\n\r\n{Describe the primary users of this product/system. Who are they? What are their key characteristics or needs relevant to this project?}\r\n\r\n## Key Features / Scope (High-Level Ideas for MVP)\r\n\r\n{List the core functionalities or features envisioned for the MVP. Keep this high-level; details will go in the PRD/Epics.}\r\n\r\n- Feature Idea 1: ...\r\n- Feature Idea 2: ...\r\n- Feature Idea N: ...\r\n\r\n## Post MVP Features / Scope and Ideas\r\n\r\n{List the core functionalities or features envisioned as potential for POST MVP. Keep this high-level; details will go in the PRD/Epics/Architecture.}\r\n\r\n- Feature Idea 1: ...\r\n- Feature Idea 2: ...\r\n- Feature Idea N: ...\r\n\r\n## Known Technical Constraints or Preferences\r\n\r\n- **Constraints:** {List any known limitations and technical mandates or preferences - e.g., budget, timeline, specific technology mandates, required integrations, compliance needs.}\r\n- **Initial Architectural Preferences (if any):** {Capture any early thoughts or strong preferences regarding repository structure (e.g., monorepo, polyrepo) and overall service architecture (e.g., monolith, microservices, serverless components). This is not a final decision point but for initial awareness.}\r\n- **Risks:** {Identify potential risks - e.g., technical challenges, resource availability, market acceptance, dependencies.}\r\n- **User Preferences:** {Any specific requests from the user that are not a high level feature that could direct technology or library choices, or anything else that came up in the brainstorming or drafting of the PRD that is not included in prior document sections}\r\n\r\n## Relevant Research (Optional)\r\n\r\n{Link to or summarize findings from any initial research conducted (e.g., `deep-research-report-BA.md`).}\r\n\r\n## PM Prompt\r\n\r\nThis Project Brief provides the full context for {Project Name}. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section 1 at a time, asking for any necessary clarification or suggesting improvements as your mode 1 programming allows.\r\n\r\n<example_handoff_prompt>\r\nThis Project Brief provides the full context for Mealmate. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section 1 at a time, asking for any necessary clarification or suggesting improvements as your mode 1 programming allows.</example_handoff_prompt>\r\n\r\n==================== END: project-brief-tmpl ====================\r\n\r\n\r\n==================== START: story-tmpl ====================",
+  "metadata": {
+    "templateName": "project-brief-project-name.md",
+    "syncedAt": "2025-06-11T19:47:21.668Z",
+    "isTemplate": true,
+    "createdAt": "2025-06-11T19:47:21.668Z",
+    "wordCount": 449,
+    "characterCount": 3142
+  },
+  "tags": [
+    "template",
+    "architecture",
+    "ui-ux"
+  ],
+  "summary": "## Introduction / Problem Statement\r\n\r\n{Describe the core idea, the problem being solved, or the opportunity being addressed.  Why is this project needed. }\r\n\r\n## Vision & Goals\r\n\r\n- **Vision:** {Desc..."
+}

@@ -70,10 +70,30 @@ class AIOrchestrator {
    * Load template content
    */
   loadTemplate(templateName) {
-    const templatePath = path.join(this.templatesDir, templateName);
-    if (!fs.existsSync(templatePath)) {
-      throw new Error(`Template not found: ${templateName}`);
+    // Map short template names to actual filenames
+    const templateMap = {
+      'project-brief': 'project-brief-project-name.md',
+      'prd': 'project-name-product-requirements-document-(prd).md',
+      'architecture': 'project-name-architecture-document.md',
+      'frontend-architecture': 'project-name-frontend-architecture-document.md',
+      'uiux-specification': 'project-name-uiux-specification.md',
+      'story': 'story-epicnum.storynum-short-title-copied-from-epic-file.md'
+    };
+
+    // Use mapped filename if available, otherwise use the provided name
+    const actualTemplateName = templateMap[templateName] || templateName;
+
+    // Try the mapped name first, then try adding .md extension if needed
+    let templatePath = path.join(this.templatesDir, actualTemplateName);
+
+    if (!fs.existsSync(templatePath) && !actualTemplateName.endsWith('.md')) {
+      templatePath = path.join(this.templatesDir, actualTemplateName + '.md');
     }
+
+    if (!fs.existsSync(templatePath)) {
+      throw new Error(`Template not found: ${templateName} (looked for: ${actualTemplateName})`);
+    }
+
     return fs.readFileSync(templatePath, 'utf8');
   }
 

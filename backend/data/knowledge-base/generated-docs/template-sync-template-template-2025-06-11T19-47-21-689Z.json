@@ -1,0 +1,21 @@
+{
+  "id": "template-sync-template-template-2025-06-11T19-47-21-689Z",
+  "sessionId": "template-sync",
+  "projectName": "BMAD Templates",
+  "phase": "template",
+  "documentType": "template",
+  "content": "## Status: { Draft | Approved | InProgress | Review | Done }\r\n\r\n## Story\r\n\r\n- As a [role]\r\n- I want [action]\r\n- so that [benefit]\r\n\r\n## Acceptance Criteria (ACs)\r\n\r\n{ Copy the Acceptance Criteria numbered list }\r\n\r\n## Tasks / Subtasks\r\n\r\n- [ ] Task 1 (AC: # if applicable)\r\n  - [ ] Subtask1.1...\r\n- [ ] Task 2 (AC: # if applicable)\r\n  - [ ] Subtask 2.1...\r\n- [ ] Task 3 (AC: # if applicable)\r\n  - [ ] Subtask 3.1...\r\n\r\n## Dev Technical Guidance {detail not covered in tasks/subtasks}\r\n\r\n## Story Progress Notes\r\n\r\n### Agent Model Used: `<Agent Model Name/Version>`\r\n\r\n### Completion Notes List\r\n\r\n{Any notes about implementation choices, difficulties, or follow-up needed}\r\n\r\n### Change Log\r\n\r\n==================== END: story-tmpl ====================",
+  "metadata": {
+    "templateName": "story-epicnum.storynum-short-title-copied-from-epic-file.md",
+    "syncedAt": "2025-06-11T19:47:21.689Z",
+    "isTemplate": true,
+    "createdAt": "2025-06-11T19:47:21.689Z",
+    "wordCount": 124,
+    "characterCount": 751
+  },
+  "tags": [
+    "template",
+    "ui-ux"
+  ],
+  "summary": "## Status: { Draft | Approved | InProgress | Review | Done }\r\n\r\n## Story\r\n\r\n- As a [role]\r\n- I want [action]\r\n- so that [benefit]\r\n\r\n## Acceptance Criteria (ACs)\r\n\r\n{ Copy the Acceptance Criteria numb..."
+}

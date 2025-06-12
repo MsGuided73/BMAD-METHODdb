@@ -1,0 +1,70 @@
+{
+  "documents": [
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-664Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.664Z",
+      "summary": "This plan directs the agent on how to break down large source documents into smaller, granular files during its Librarian Phase.  The agent will refer to this plan to identify source documents, the sp..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-668Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.668Z",
+      "summary": "## Introduction / Problem Statement\r\n\r\n{Describe the core idea, the problem being solved, or the opportunity being addressed.  Why is this project needed. }\r\n\r\n## Vision & Goals\r\n\r\n- **Vision:** {Desc..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-673Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.673Z",
+      "summary": "## Introduction / Preamble\r\n\r\n{This document outlines the overall project architecture, including backend systems, shared services, and non-UI specific concerns.  Its primary goal is to serve as the g..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-678Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.678Z",
+      "summary": "## Table of Contents\r\n\r\n{ Update this if sections and subsections are added or removed }\r\n\r\n- [Introduction](#introduction)\r\n- [Overall Frontend Philosophy & Patterns](#overall-frontend-philosophy--pa..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-683Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.683Z",
+      "summary": "## Goal, Objective and Context\r\n\r\nThis should come mostly from the user or the provided brief, but ask for clarifications as needed. \r\n\r\n## Functional Requirements (MVP)\r\n\r\nYou should have a good idea..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-686Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.686Z",
+      "summary": "## Introduction\r\n\r\n{State the purpose - to define the user experience goals, information architecture, user flows, and visual design specifications for the project's user interface. }\r\n\r\n- **Link to P..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-689Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.689Z",
+      "summary": "## Status: { Draft | Approved | InProgress | Review | Done }\r\n\r\n## Story\r\n\r\n- As a [role]\r\n- I want [action]\r\n- so that [benefit]\r\n\r\n## Acceptance Criteria (ACs)\r\n\r\n{ Copy the Acceptance Criteria numb..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-692Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.692Z",
+      "summary": "## Introduction / Preamble\r\n\r\n{This document outlines the overall project architecture, including backend systems, shared services, and non-UI specific concerns.  Its primary goal is to serve as the g..."
+    },
+    {
+      "id": "template-sync-template-template-2025-06-11T19-47-21-698Z",
+      "phase": "template",
+      "documentType": "template",
+      "createdAt": "2025-06-11T19:47:21.698Z",
+      "summary": "## Table of Contents\r\n\r\n{ Update this if sections and subsections are added or removed }\r\n\r\n- [Introduction](#introduction)\r\n- [Overall Frontend Philosophy & Patterns](#overall-frontend-philosophy--pa..."
+    }
+  ],
+  "sessionId": "template-sync",
+  "projectName": "BMAD Templates",
+  "lastUpdated": "2025-06-11T19:47:21.701Z"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "template-sync-template-template-2025-06-11T19-47-21-686Z",
+  "sessionId": "template-sync",
+  "projectName": "BMAD Templates",
+  "phase": "template",
+  "documentType": "template",
+  "content": "## Introduction\r\n\r\n{State the purpose - to define the user experience goals, information architecture, user flows, and visual design specifications for the project's user interface.}\r\n\r\n- **Link to Primary Design Files:** {e.g., Figma, Sketch, Adobe XD URL}\r\n- **Link to Deployed Storybook / Design System:** {URL, if applicable}\r\n\r\n## Overall UX Goals & Principles\r\n\r\n- **Target User Personas:** {Reference personas or briefly describe key user types and their goals.}\r\n- **Usability Goals:** {e.g., Ease of learning, efficiency of use, error prevention.}\r\n- **Design Principles:** {List 3-5 core principles guiding the UI/UX design - e.g., \"Clarity over cleverness\", \"Consistency\", \"Provide feedback\".}\r\n\r\n## Information Architecture (IA)\r\n\r\n- **Site Map / Screen Inventory:**\r\n  ```mermaid\r\n  graph TD\r\n      A[Homepage] --> B(Dashboard);\r\n      A --> C{Settings};\r\n      B --> D[View Details];\r\n      C --> E[Profile Settings];\r\n      C --> F[Notification Settings];\r\n  ```\r\n  _(Or provide a list of all screens/pages)_\r\n- **Navigation Structure:** {Describe primary navigation (e.g., top bar, sidebar), secondary navigation, breadcrumbs, etc.}\r\n\r\n## User Flows\r\n\r\n{Detail key user tasks. Use diagrams or descriptions.}\r\n\r\n### {User Flow Name, e.g., User Login}\r\n\r\n- **Goal:** {What the user wants to achieve.}\r\n- **Steps / Diagram:**\r\n  ```mermaid\r\n  graph TD\r\n      Start --> EnterCredentials[Enter Email/Password];\r\n      EnterCredentials --> ClickLogin[Click Login Button];\r\n      ClickLogin --> CheckAuth{Auth OK?};\r\n      CheckAuth -- Yes --> Dashboard;\r\n      CheckAuth -- No --> ShowError[Show Error Message];\r\n      ShowError --> EnterCredentials;\r\n  ```\r\n  _(Or: Link to specific flow diagram in Figma/Miro)_\r\n\r\n### {Another User Flow Name}\r\n\r\n{...}\r\n\r\n## Wireframes & Mockups\r\n\r\n{Reference the main design file link above. Optionally embed key mockups or describe main screen layouts.}\r\n\r\n- **Screen / View Name 1:** {Description of layout and key elements. Link to specific Figma frame/page.}\r\n- **Screen / View Name 2:** {...}\r\n\r\n## Component Library / Design System Reference\r\n\r\n## Branding & Style Guide Reference\r\n\r\n{Link to the primary source or define key elements here.}\r\n\r\n- **Color Palette:** {Primary, Secondary, Accent, Feedback colors (hex codes).}\r\n- **Typography:** {Font families, sizes, weights for headings, body, etc.}\r\n- **Iconography:** {Link to icon set, usage notes.}\r\n- **Spacing & Grid:** {Define margins, padding, grid system rules.}\r\n\r\n## Accessibility (AX) Requirements\r\n\r\n- **Target Compliance:** {e.g., WCAG 2.1 AA}\r\n- **Specific Requirements:** {Keyboard navigation patterns, ARIA landmarks/attributes for complex components, color contrast minimums.}\r\n\r\n## Responsiveness\r\n\r\n- **Breakpoints:** {Define pixel values for mobile, tablet, desktop, etc.}\r\n- **Adaptation Strategy:** {Describe how layout and components adapt across breakpoints. Reference designs.}\r\n\r\n## Change Log\r\n\r\n| Change        | Date       | Version | Description         | Author         |\r\n| ------------- | ---------- | ------- | ------------------- | -------------- |\r\n\r\n==================== END: front-end-spec-tmpl ====================\r\n\r\n\r\n==================== START: prd-tmpl ====================",
+  "metadata": {
+    "templateName": "project-name-uiux-specification.md",
+    "syncedAt": "2025-06-11T19:47:21.686Z",
+    "isTemplate": true,
+    "createdAt": "2025-06-11T19:47:21.686Z",
+    "wordCount": 417,
+    "characterCount": 3220
+  },
+  "tags": [
+    "template",
+    "architecture",
+    "requirements",
+    "ui-ux"
+  ],
+  "summary": "## Introduction\r\n\r\n{State the purpose - to define the user experience goals, information architecture, user flows, and visual design specifications for the project's user interface. }\r\n\r\n- **Link to P..."
+}

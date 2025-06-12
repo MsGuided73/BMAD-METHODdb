@@ -6,6 +6,9 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
+// Initialize database
+const { initializeDatabase } = require('./models');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -32,12 +35,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // Routes
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/templates', require('./routes/templates'));
 app.use('/api/checklists', require('./routes/checklists'));
 app.use('/api/agents', require('./routes/agents'));
 app.use('/api/generator', require('./routes/generator'));
-app.use('/api/sessions', require('./routes/sessions'));
+app.use('/api/sessions', require('./routes/sessions-enhanced')); // Use enhanced sessions with auth support
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/knowledge-base', require('./routes/knowledge-base')); // Knowledge base for voice agent
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -58,7 +63,26 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 BMAD Planning Backend running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-});
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    // Initialize database connection
+    const dbInitialized = await initializeDatabase();
+
+    if (!dbInitialized) {
+      console.error('❌ Failed to initialize database. Server will not start.');
+      process.exit(1);
+    }
+
+    app.listen(PORT, () => {
+      console.log(`🚀 BMAD Planning Backend running on port ${PORT}`);
+      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`🔐 Authentication endpoints: http://localhost:${PORT}/api/auth`);
+    });
+  } catch (error) {
+    console.error('❌ Server startup failed:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

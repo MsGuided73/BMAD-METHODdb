@@ -4,6 +4,7 @@ import Head from 'next/head';
 
 // Context for managing global state
 import { SessionProvider } from '../contexts/SessionContext';
+import { AuthProvider } from '../contexts/AuthContext';
 
 function MyApp({ Component, pageProps }) {
   const [mounted, setMounted] = useState(false);
@@ -24,9 +25,11 @@ function MyApp({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <SessionProvider>
-        <Component {...pageProps} />
-      </SessionProvider>
+      <AuthProvider>
+        <SessionProvider>
+          <Component {...pageProps} />
+        </SessionProvider>
+      </AuthProvider>
     </>
   );
 }

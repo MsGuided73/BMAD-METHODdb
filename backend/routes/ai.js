@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const AIOrchestrator = require('../services/aiOrchestrator');
 const FileManager = require('../services/fileManager');
+const KnowledgeBaseService = require('../services/knowledgeBase');
 
-// Initialize AI Orchestrator and File Manager
+// Initialize AI Orchestrator, File Manager, and Knowledge Base
 const aiOrchestrator = new AIOrchestrator();
 const fileManager = new FileManager();
+const knowledgeBase = new KnowledgeBaseService();
 
 // Initialize with API key from environment
 if (process.env.GEMINI_API_KEY) {
@@ -93,6 +95,31 @@ router.post('/generate-template', async (req, res) => {
     };
 
     const result = await aiOrchestrator.generateTemplateContent(templateName, agentId, enhancedContext);
+
+    // Auto-save to knowledge base for voice agent
+    if (result.content) {
+      try {
+        const kbResult = await knowledgeBase.saveDocument({
+          sessionId: sessionId,
+          projectName: enhancedContext.projectName || 'Generated Project',
+          phase: enhancedContext.currentPhase || 'unknown',
+          documentType: templateName,
+          content: result.content,
+          metadata: {
+            agentId,
+            templateName,
+            generatedAt: new Date().toISOString(),
+            isGenerated: true,
+            filename: result.savedFile?.filename
+          }
+        });
+
+        console.log(`📚 Auto-saved to knowledge base: ${kbResult.success ? 'Success' : 'Failed'}`);
+      } catch (kbError) {
+        console.error('Knowledge base auto-save failed:', kbError);
+        // Don't fail the main request if KB save fails
+      }
+    }
 
     res.json({
       success: true,

@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
+import { autoSaveToKnowledgeBase, autoSavePhaseCompletion, autoSaveChatInteraction } from '../utils/knowledgeBase';
 
 // Get API base URL
 const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -125,6 +126,17 @@ export function SessionProvider({ children }) {
           data,
           outputs
         });
+
+        // Auto-save phase completion to knowledge base for voice agent
+        if (state.session && outputs && outputs.length > 0) {
+          try {
+            await autoSavePhaseCompletion(state.session, phase, outputs);
+          } catch (kbError) {
+            console.warn('Knowledge base auto-save failed:', kbError);
+            // Don't fail the phase completion if KB save fails
+          }
+        }
+
         dispatch({
           type: 'COMPLETE_PHASE',
           payload: {
