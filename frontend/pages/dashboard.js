@@ -156,7 +156,7 @@ export default function Dashboard() {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         setProjects(projects.filter(p => p.id !== projectId));
       } else {
@@ -164,6 +164,44 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error('Delete project error:', err);
+      setError(err.message);
+    }
+  };
+
+  const handleDuplicateProject = async (project) => {
+    try {
+      const duplicateData = {
+        projectName: `${project.projectName} (Copy)`,
+        description: project.description,
+        tags: project.tags,
+        isPublic: project.isPublic || false
+      };
+
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('bmad_token')}`
+        },
+        body: JSON.stringify(duplicateData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to duplicate project');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setProjects([data.project, ...projects]);
+
+        // Navigate to the duplicated project
+        router.push(`/wizard/${data.project.id}`);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      console.error('Duplicate project error:', err);
       setError(err.message);
     }
   };
@@ -194,10 +232,10 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Project Dashboard
+                  Project Hub
                 </h1>
                 <p className="mt-2 text-gray-600">
-                  Welcome back, {user?.firstName || user?.email}! Manage your BMAD planning projects.
+                  Welcome back, {user?.firstName || user?.email}! Manage your BMAD Method projects and track your progress.
                 </p>
               </div>
               <GradientButton
@@ -289,6 +327,7 @@ export default function Dashboard() {
                     key={project.id}
                     project={project}
                     onDelete={handleDeleteProject}
+                    onDuplicate={handleDuplicateProject}
                   />
                 ))}
               </div>

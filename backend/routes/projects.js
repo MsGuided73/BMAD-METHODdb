@@ -2,6 +2,9 @@ const express = require('express');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const AirtableService = require('../services/airtableService');
 const { Session } = require('../models');
+const archiver = require('archiver');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 const airtableService = new AirtableService();
@@ -59,16 +62,13 @@ router.get('/', requireAuth, async (req, res) => {
     // Sort by updated date
     allProjects.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
+    // Calculate comprehensive stats
+    const stats = calculateProjectStats(allProjects);
+
     res.json({
       success: true,
       projects: allProjects,
-      stats: {
-        total: allProjects.length,
-        active: allProjects.filter(p => p.status === 'active').length,
-        completed: allProjects.filter(p => p.status === 'completed').length,
-        local: localProjects.length,
-        airtable: airtableResult.success ? airtableResult.projects.length : 0
-      }
+      stats
     });
 
   } catch (error) {
@@ -360,6 +360,126 @@ router.get('/:id/documents', optionalAuth, async (req, res) => {
 });
 
 /**
+ * GET /api/projects/:id/export
+ * Export all project documents as a ZIP file
+ */
+router.get('/:id/export', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    // Get project details
+    const project = await Session.findOne({
+      where: { id, user_id: userId }
+    });
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        error: 'Project not found or access denied'
+      });
+    }
+
+    // Create ZIP archive
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
+
+    // Set response headers
+    const projectName = project.project_name || 'project';
+    const sanitizedName = projectName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const filename = `${sanitizedName}-export-${new Date().toISOString().slice(0, 10)}.zip`;
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // Pipe archive to response
+    archive.pipe(res);
+
+    // Add project metadata
+    const projectMetadata = {
+      projectName: project.project_name,
+      description: project.description,
+      currentPhase: project.current_phase,
+      status: project.status,
+      createdAt: project.created_at,
+      updatedAt: project.updated_at,
+      tags: project.tags ? project.tags.split(',') : [],
+      isPublic: project.is_public,
+      phases: project.phases || {},
+      generatedFiles: project.generated_files || [],
+      exportedAt: new Date().toISOString(),
+      exportedBy: req.user.email
+    };
+
+    archive.append(JSON.stringify(projectMetadata, null, 2), { name: 'project-metadata.json' });
+
+    // Add generated files from session directory
+    const sessionDir = path.join(__dirname, '../generated-docs', id);
+    if (fs.existsSync(sessionDir)) {
+      const files = fs.readdirSync(sessionDir);
+
+      for (const file of files) {
+        const filePath = path.join(sessionDir, file);
+        if (fs.statSync(filePath).isFile()) {
+          const content = fs.readFileSync(filePath, 'utf8');
+          archive.append(content, { name: `documents/${file}` });
+        }
+      }
+    }
+
+    // Add README with instructions
+    const readmeContent = `# ${project.project_name} - BMAD Method Export
+
+This export contains all documents and metadata for your BMAD Method project.
+
+## Contents
+
+- **project-metadata.json**: Project configuration and metadata
+- **documents/**: All generated documents from the BMAD workflow
+
+## Project Information
+
+- **Name**: ${project.project_name}
+- **Description**: ${project.description || 'No description provided'}
+- **Current Phase**: ${project.current_phase}
+- **Status**: ${project.status}
+- **Created**: ${new Date(project.created_at).toLocaleDateString()}
+- **Last Updated**: ${new Date(project.updated_at).toLocaleDateString()}
+
+## BMAD Method Phases
+
+The BMAD Method follows these phases:
+1. **Business Analyst** - Project brief and requirements gathering
+2. **Project Manager** - Product requirements document (PRD)
+3. **Solution Architect** - Technical architecture design
+4. **Design Architect** - UI/UX specifications and design system
+5. **Product Owner** - Validation and acceptance criteria
+6. **Scrum Master** - Story creation and sprint planning
+
+## Usage
+
+You can import this project back into the BMAD Method system or use the documents independently for your development process.
+
+Generated on: ${new Date().toLocaleDateString()}
+Exported by: ${req.user.email}
+`;
+
+    archive.append(readmeContent, { name: 'README.md' });
+
+    // Finalize the archive
+    await archive.finalize();
+
+  } catch (error) {
+    console.error('Export project error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to export project'
+    });
+  }
+});
+
+/**
  * GET /api/projects/search
  * Search projects
  */
@@ -403,11 +523,63 @@ router.get('/search', requireAuth, async (req, res) => {
  */
 function calculateLocalProgress(phases) {
   if (!phases) return 0;
-  
+
   const phaseNames = ['analyst', 'pm', 'architect', 'designArchitect', 'po', 'sm'];
   const completedPhases = phaseNames.filter(phase => phases[phase]?.completed).length;
-  
+
   return Math.round((completedPhases / phaseNames.length) * 100);
+}
+
+/**
+ * Helper function to calculate comprehensive project statistics
+ */
+function calculateProjectStats(projects) {
+  const now = new Date();
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const stats = {
+    totalProjects: projects.length,
+    activeProjects: projects.filter(p => p.status === 'active').length,
+    completedProjects: projects.filter(p => p.status === 'completed').length,
+    pausedProjects: projects.filter(p => p.status === 'paused').length,
+    archivedProjects: projects.filter(p => p.status === 'archived').length,
+    projectsThisMonth: projects.filter(p => new Date(p.createdAt) >= thisMonth).length,
+    averageProgress: 0,
+    totalDocuments: 0,
+    phaseDistribution: {
+      analyst: 0,
+      pm: 0,
+      architect: 0,
+      designArchitect: 0,
+      po: 0,
+      sm: 0
+    },
+    sourceDistribution: {
+      local: projects.filter(p => p.source === 'local').length,
+      airtable: projects.filter(p => p.source === 'airtable').length
+    }
+  };
+
+  // Calculate average progress
+  if (projects.length > 0) {
+    const totalProgress = projects.reduce((sum, project) => sum + (project.progress || 0), 0);
+    stats.averageProgress = Math.round(totalProgress / projects.length);
+  }
+
+  // Calculate total documents
+  stats.totalDocuments = projects.reduce((sum, project) => {
+    return sum + (project.generatedFiles ? project.generatedFiles.length : 0);
+  }, 0);
+
+  // Calculate phase distribution
+  projects.forEach(project => {
+    const phase = project.currentPhase;
+    if (stats.phaseDistribution.hasOwnProperty(phase)) {
+      stats.phaseDistribution[phase]++;
+    }
+  });
+
+  return stats;
 }
 
 module.exports = router;

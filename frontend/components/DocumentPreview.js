@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { getApiUrl } from '../utils/api';
 import { EyeIcon, DocumentIcon } from './Icons';
 
-export default function DocumentPreview({ title, content, filename }) {
+export default function DocumentPreview({ title, content, filename, projectName, documentType, metadata }) {
   const [viewMode, setViewMode] = useState('preview'); // preview, raw
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const copyToClipboard = async () => {
     try {
@@ -24,6 +26,61 @@ export default function DocumentPreview({ title, content, filename }) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const exportToPDF = async () => {
+    try {
+      setIsExportingPDF(true);
+
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/api/pdf-export/document`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content,
+          title: title || filename?.replace('.md', ''),
+          projectName: projectName || 'Project',
+          documentType: documentType || 'Document',
+          metadata: metadata || {}
+        })
+      });
+
+      if (response.ok) {
+        // Get the PDF blob
+        const blob = await response.blob();
+
+        // Extract filename from response headers or generate one
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let pdfFilename = 'document.pdf';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+          if (filenameMatch) {
+            pdfFilename = filenameMatch[1];
+          }
+        }
+
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = pdfFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        const errorData = await response.json();
+        console.error('PDF export failed:', errorData.error);
+        alert('Failed to export PDF: ' + errorData.error);
+      }
+    } catch (error) {
+      console.error('PDF export error:', error);
+      alert('Failed to export PDF: ' + error.message);
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   return (
@@ -71,9 +128,16 @@ export default function DocumentPreview({ title, content, filename }) {
             </button>
             <button
               onClick={downloadFile}
+              className="btn btn-outline btn-sm"
+            >
+              Download MD
+            </button>
+            <button
+              onClick={exportToPDF}
+              disabled={isExportingPDF}
               className="btn btn-primary btn-sm"
             >
-              Download
+              {isExportingPDF ? 'Exporting...' : 'Export PDF'}
             </button>
           </div>
         </div>

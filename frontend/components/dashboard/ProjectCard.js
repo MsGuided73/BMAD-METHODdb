@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  PlayIcon, 
-  EyeIcon, 
-  DocumentIcon, 
-  TrashIcon, 
+import {
+  PlayIcon,
+  EyeIcon,
+  DocumentIcon,
+  TrashIcon,
   CalendarIcon,
   ClockIcon,
   TagIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  DocumentArrowDownIcon,
+  DocumentDuplicateIcon,
+  EllipsisVerticalIcon,
+  ArchiveBoxIcon
 } from '../Icons';
+import { getApiUrl } from '../../utils/api';
 
 const phaseNames = {
   analyst: 'Business Analyst',
@@ -36,8 +41,10 @@ const phaseColors = {
   sm: 'bg-orange-100 text-orange-800'
 };
 
-export default function ProjectCard({ project, onDelete }) {
+export default function ProjectCard({ project, onDelete, onDuplicate }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -58,6 +65,48 @@ export default function ProjectCard({ project, onDelete }) {
   const handleDelete = () => {
     onDelete(project.id);
     setShowDeleteConfirm(false);
+  };
+
+  const handleDuplicate = () => {
+    if (onDuplicate) {
+      onDuplicate(project);
+    }
+    setShowActionsMenu(false);
+  };
+
+  const handleExportProject = async () => {
+    try {
+      setIsExporting(true);
+      setShowActionsMenu(false);
+
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/api/projects/${project.id}/export`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('bmad_token')}`
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${project.projectName.toLowerCase().replace(/\s+/g, '-')}-export.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        console.error('Export failed');
+        alert('Failed to export project');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export project');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -170,17 +219,9 @@ export default function ProjectCard({ project, onDelete }) {
                 Docs
               </button>
             </Link>
-
-            {/* Analytics Button */}
-            <Link href={`/projects/${project.id}/analytics`}>
-              <button className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                <ChartBarIcon className="h-3 w-3 mr-1" />
-                Stats
-              </button>
-            </Link>
           </div>
 
-          {/* Delete Button */}
+          {/* Actions Menu */}
           <div className="relative">
             {showDeleteConfirm ? (
               <div className="flex items-center space-x-2">
@@ -198,13 +239,62 @@ export default function ProjectCard({ project, onDelete }) {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="inline-flex items-center p-1.5 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 rounded transition-colors"
-                title="Delete project"
-              >
-                <TrashIcon className="h-4 w-4" />
-              </button>
+              <>
+                <button
+                  onClick={() => setShowActionsMenu(!showActionsMenu)}
+                  className="inline-flex items-center p-1.5 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 rounded transition-colors"
+                  title="More actions"
+                >
+                  <EllipsisVerticalIcon className="h-4 w-4" />
+                </button>
+
+                {/* Actions Dropdown */}
+                {showActionsMenu && (
+                  <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10">
+                    <button
+                      onClick={handleExportProject}
+                      disabled={isExporting}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
+                      {isExporting ? 'Exporting...' : 'Export Project'}
+                    </button>
+
+                    {onDuplicate && (
+                      <button
+                        onClick={handleDuplicate}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <DocumentDuplicateIcon className="h-4 w-4 mr-2" />
+                        Duplicate Project
+                      </button>
+                    )}
+
+                    <Link href={`/projects/${project.id}/analytics`}>
+                      <button
+                        onClick={() => setShowActionsMenu(false)}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <ChartBarIcon className="h-4 w-4 mr-2" />
+                        View Analytics
+                      </button>
+                    </Link>
+
+                    <div className="border-t border-gray-100 my-1"></div>
+
+                    <button
+                      onClick={() => {
+                        setShowDeleteConfirm(true);
+                        setShowActionsMenu(false);
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                    >
+                      <TrashIcon className="h-4 w-4 mr-2" />
+                      Delete Project
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -262,6 +262,30 @@ Tags: ${document.tags.join(', ')}`,
   }
 
   /**
+   * Get a specific document by ID
+   */
+  async getDocument(documentId) {
+    try {
+      const filePath = path.join(
+        this.knowledgeBaseDir,
+        'generated-docs',
+        `${documentId}.json`
+      );
+
+      if (!fs.existsSync(filePath)) {
+        return { success: false, error: 'Document not found' };
+      }
+
+      const document = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      return { success: true, document };
+
+    } catch (error) {
+      console.error('Failed to get document:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Search documents in knowledge base
    */
   async searchDocuments(query, filters = {}) {

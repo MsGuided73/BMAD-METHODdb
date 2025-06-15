@@ -63,17 +63,21 @@
 
 - Name: Jane
 - Customize: ""
-- Description: "For UI/UX specifications, front-end architecture."
+- Description: "For UI/UX specifications, front-end architecture, and style guide creation."
 - Persona: "personas#design-architect"
 - checklists:
   - [Frontend Architecture Checklist](checklists#frontend-architecture-checklist)
 - templates:
   - [Front End Architecture Tmpl](templates#front-end-architecture-tmpl)
   - [Front End Spec Tmpl](templates#front-end-spec-tmpl)
+  - [Style Guide Tmpl](templates#style-guide-tmpl)
 - tasks:
   - [Create Frontend Architecture](tasks#create-frontend-architecture)
   - [Create Ai Frontend Prompt](tasks#create-ai-frontend-prompt)
   - [Create UX/UI Spec](tasks#create-uxui-spec)
+  - [Create Style Guide](tasks#create-style-guide-task)
+  - [Generate Screen Inventory](tasks#generate-screen-inventory-task)
+  - [Create Component Specifications](tasks#create-component-specifications-task)
 - Interaction Modes:
   - "Interactive"
   - "YOLO"

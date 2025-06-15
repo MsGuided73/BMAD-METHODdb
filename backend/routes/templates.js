@@ -126,7 +126,7 @@ router.get('/by-phase/:phase', (req, res) => {
       'analyst': ['project-brief'],
       'pm': ['prd', 'product-requirements'],
       'architect': ['architecture-document'],
-      'design-architect': ['frontend-architecture', 'uiux-specification'],
+      'design-architect': ['frontend-architecture', 'uiux-specification', 'style-guide', 'screen-inventory', 'component-specification'],
       'po': ['story'],
       'sm': ['story']
     };

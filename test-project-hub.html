@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMAD Project Hub - Test Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9fafb;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #4338ca;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #4f46e5;
+            border: 1px solid #4f46e5;
+        }
+        .btn-outline:hover {
+            background: #4f46e5;
+            color: white;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        pre {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .endpoint {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8fafc;
+            border-left: 4px solid #4f46e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 BMAD Project Hub - Test Interface</h1>
+        <p>Test the Project Hub API endpoints while the frontend is being set up</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>🔍 API Health Checks</h2>
+            <button class="btn" onclick="testHealth()">Test Main API Health</button>
+            <button class="btn" onclick="testPDFHealth()">Test PDF Export Health</button>
+            <div id="health-status"></div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Backend Status</h2>
+            <div class="endpoint">
+                <strong>Backend:</strong> http://localhost:3001<br>
+                <strong>Status:</strong> <span id="backend-status">Checking...</span>
+            </div>
+            <div class="endpoint">
+                <strong>PDF Service:</strong> /api/pdf-export/health<br>
+                <strong>Status:</strong> <span id="pdf-status">Checking...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Available API Endpoints</h2>
+        <div class="grid">
+            <div>
+                <h3>Authentication</h3>
+                <ul>
+                    <li>POST /api/auth/register</li>
+                    <li>POST /api/auth/login</li>
+                    <li>POST /api/auth/logout</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Projects</h3>
+                <ul>
+                    <li>GET /api/projects</li>
+                    <li>POST /api/projects</li>
+                    <li>GET /api/projects/:id</li>
+                    <li>PUT /api/projects/:id</li>
+                    <li>DELETE /api/projects/:id</li>
+                    <li>GET /api/projects/:id/export</li>
+                </ul>
+            </div>
+            <div>
+                <h3>PDF Export</h3>
+                <ul>
+                    <li>POST /api/pdf-export/document</li>
+                    <li>GET /api/pdf-export/session/:id/:file</li>
+                    <li>GET /api/pdf-export/knowledge-base/:id</li>
+                    <li>POST /api/pdf-export/template</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📝 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔗 Quick Links</h2>
+        <p>Once you free up disk space and install frontend dependencies:</p>
+        <ul>
+            <li><strong>Frontend:</strong> <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+            <li><strong>Project Hub:</strong> <a href="http://localhost:3000/dashboard" target="_blank">http://localhost:3000/dashboard</a></li>
+            <li><strong>Backend API:</strong> <a href="http://localhost:3001/api/health" target="_blank">http://localhost:3001/api/health</a></li>
+        </ul>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+
+        async function testHealth() {
+            const statusDiv = document.getElementById('health-status');
+            statusDiv.innerHTML = '<div class="status">Testing...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Main API Health:</strong> ${data.status}<br>
+                        <strong>Timestamp:</strong> ${data.timestamp}
+                    </div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Main API Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function testPDFHealth() {
+            const statusDiv = document.getElementById('health-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/pdf-export/health`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML += `
+                    <div class="status success">
+                        <strong>✅ PDF Export Health:</strong> ${data.status}<br>
+                        <strong>Service:</strong> ${data.service}<br>
+                        <strong>Supported Formats:</strong> ${data.supportedFormats.join(', ')}
+                    </div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML += `
+                    <div class="status error">
+                        <strong>❌ PDF Export Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check status on load
+        window.onload = function() {
+            testHealth();
+            setTimeout(testPDFHealth, 1000);
+        };
+    </script>
+</body>
+</html>
