@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from '../contexts/SessionContext';
 import { useAuth } from '../contexts/AuthContext';
 import { GradientButton } from './ui/gradient-button';
@@ -58,6 +58,7 @@ export default function Layout({ children, showNavigation = true }) {
   const { session, error } = useSession();
   const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },

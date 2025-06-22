@@ -1,0 +1,14 @@
+# Robots.txt for BMAD Method Planning App
+# https://simpleai4you.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://simpleai4you.com/sitemap.xml
+
+# Disallow sensitive areas (if any)
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /wizard/*/private

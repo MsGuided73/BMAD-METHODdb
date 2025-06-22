@@ -1,0 +1,29 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://api.simpleai4you.com"
+  NEXT_PUBLIC_BACKEND_URL = "https://api.simpleai4you.com"
+  NEXT_PUBLIC_APP_NAME = "BMAD Method Planning"
+  NEXT_PUBLIC_APP_URL = "https://simpleai4you.com"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.simpleai4you.com/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "origin-when-cross-origin"
+
+# Handle client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
